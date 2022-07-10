@@ -1,0 +1,14 @@
+{
+  "name": "expect-type-example-jest",
+  "scripts": {
+    "test": "jest",
+    "postinstall": "cd node_modules/@yamatomo/expect-type && pnpm build"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "@yamatomo/expect-type": "../..",
+    "jest": "^28.1.2",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
+  }
+}

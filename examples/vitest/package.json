@@ -1,0 +1,13 @@
+{
+  "name": "expect-type-example-vite",
+  "scripts": {
+    "test": "tsc && vitest",
+    "postinstall": "cd node_modules/@yamatomo/expect-type && pnpm build"
+  },
+  "devDependencies": {
+    "@yamatomo/expect-type": "../..",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.14",
+    "vitest": "^0.18.0"
+  }
+}

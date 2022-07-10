@@ -1,0 +1,49 @@
+{
+  "name": "@yamatomo/expect-type",
+  "version": "1.0.0",
+  "description": "runtime tests for types",
+  "keywords": [
+    "typescript",
+    "type-check",
+    "assert",
+    "types",
+    "typings",
+    "test",
+    "testing"
+  ],
+  "author": "Yama-Tomo",
+  "homepage": "https://github.com/Yama-Tomo/expect-type#readme",
+  "repository": "https://github.com/Yama-Tomo/expect-type.git",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "FORCE_COLOR=true run-p -l -c lint:*",
+    "lint:eslint": "eslint './**/*.{js,ts,tsx}' --format codeframe --color --max-warnings=0",
+    "lint:typing": "tsc --pretty --noEmit",
+    "lint:format": "prettier -c './**/*.{js,ts,tsx}'",
+    "format": "prettier -w './**/*.{js,ts,tsx}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "ts-morph": ">=5"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-formatter-codeframe": "^7.32.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
+    "standard-version": "^9.5.0",
+    "ts-morph": "^15.1.0",
+    "typescript": "^4.7.4",
+    "vitest": "^0.18.0"
+  }
+}
