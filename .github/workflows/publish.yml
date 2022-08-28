@@ -6,6 +6,8 @@ on:
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release_created.outputs.value }}
     steps:
       - uses: google-github-actions/release-please-action@v3
         id: release
@@ -13,11 +15,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           package-name: "@yamatomo/expect-type"
+      - id: release_created
+        run: echo ::set-output name=value::${{ (steps.release.outputs.release_created == true && 'true') || 'false' }}
 
   publish:
     runs-on: ubuntu-latest
     needs: create-release-pr
-    if: ${{ needs.create-release-pr.release.outputs.release_created }}
+    if: ${{ needs.create-release-pr.outputs.release_created }} == 'true'
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup_node
