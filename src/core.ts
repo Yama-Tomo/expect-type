@@ -1,27 +1,27 @@
-import { Project, ProjectOptions, SourceFile, TypeFormatFlags } from 'ts-morph';
+import * as ts from 'typescript';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkgInfo = require('../package.json');
 
-let _project: Project | undefined;
-const getProject = () => {
-  if (!_project) {
-    _project = new Project(_options?.projectOptions);
+type FilePath = string;
+const _program: Record<FilePath, ts.Program> = {};
+const getProgram = (filePath: string) => {
+  if (!_program[filePath]) {
+    const options = _options?.compilerOptions ?? {};
+    _program[filePath] = ts.createProgram([filePath], options);
   }
 
-  return _project;
+  return _program[filePath];
 };
 
 type Options = Partial<{
-  projectOptions: ProjectOptions;
+  compilerOptions: ts.CompilerOptions;
   testFilePath: (filePath: string) => boolean;
-  typeFormat: TypeFormatFlags;
+  typeFormat: ts.TypeFormatFlags;
 }>;
 const defaultOptions: Options = {
-  projectOptions: {
-    compilerOptions: { strict: true },
-  },
-  typeFormat: TypeFormatFlags.NoTruncation | TypeFormatFlags.InTypeAlias,
+  compilerOptions: { strict: true },
+  typeFormat: ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias,
 };
 let _options: Options = defaultOptions;
 const configure = (options: Options): Options => {
@@ -30,8 +30,6 @@ const configure = (options: Options): Options => {
 
   return oldOptions;
 };
-
-const _tsSources: Record<string, SourceFile> = {};
 
 const getCallerTestFilePath = (trace: string[]) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -59,20 +57,47 @@ const extractFilePath = (trace: string) => {
 
 const type = (typeName: string): string => {
   const callerTestFilePath = getCallerTestFilePath(new Error().stack?.split('\n') ?? []);
-
-  if (!_tsSources[callerTestFilePath]) {
-    _tsSources[callerTestFilePath] = getProject().addSourceFileAtPath(callerTestFilePath);
-  }
-
-  const tsSource = _tsSources[callerTestFilePath];
-  const typeString =
-    tsSource.getTypeAlias(typeName)?.getType().getText(undefined, _options.typeFormat) ??
-    tsSource.getInterface(typeName)?.getType().getText(undefined, _options.typeFormat);
+  const typeString = getTypeString(callerTestFilePath, typeName);
   if (!typeString) {
     throw new Error(`${pkgInfo.name}: not found \`${typeName}\` type in ${callerTestFilePath}`);
   }
 
   return typeString;
+};
+
+const getTypeString = (filePath: FilePath, typeName: string) => {
+  const program = getProgram(filePath);
+  const checker = program.getTypeChecker();
+  const source = program.getSourceFile(filePath);
+  if (!source) {
+    throw new Error(`${pkgInfo.name}: can't load ${filePath}`);
+  }
+
+  const toTypeString = (node: ts.Node | undefined) => {
+    if (node) {
+      const typeLocation = checker.getTypeAtLocation(node);
+      if (typeLocation) {
+        return checker.typeToString(typeLocation, undefined, _options.typeFormat);
+      }
+    }
+
+    return undefined;
+  };
+
+  return (
+    toTypeString(
+      source.statements.find(
+        (st): st is ts.TypeAliasDeclaration =>
+          ts.isTypeAliasDeclaration(st) && st.name.getText() === typeName
+      )?.type
+    ) ??
+    toTypeString(
+      source.statements.find(
+        (st): st is ts.InterfaceDeclaration =>
+          ts.isInterfaceDeclaration(st) && st.name.getText() === typeName
+      )
+    )
+  );
 };
 
 export { configure, type };
