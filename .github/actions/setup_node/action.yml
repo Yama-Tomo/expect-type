@@ -10,6 +10,7 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version: 16
+        registry-url: https://registry.npmjs.org
         cache: 'pnpm'
         cache-dependency-path: 'examples/**/pnpm-lock.yaml'
     - shell: bash
