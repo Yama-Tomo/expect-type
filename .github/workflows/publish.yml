@@ -1,0 +1,27 @@
+name: publish
+on:
+  push:
+    branches:
+      - main
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+          package-name: "@yamatomo/expect-type"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: create-release-pr
+    if: ${{ needs.create-release-pr.release.outputs.release_created }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup_node
+      - run: pnpm build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
