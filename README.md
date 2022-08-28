@@ -1,13 +1,11 @@
 # expect-type
 
-Use [ts-morph](https://github.com/dsherret/ts-morph) to extract the types defined in the code as a string and test it.
+Extracts the type defined in the code as a string for assertion.
 
 # usage
 
-Install ts-morph that compatibles the typescript version you are using.
-
 ```bash
-yarn add -D ts-morph @yamatomo/expect-type
+yarn add -D @yamatomo/expect-type
 ```
 
 ```typescript
