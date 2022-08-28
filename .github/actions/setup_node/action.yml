@@ -1,0 +1,19 @@
+name: setup_node
+description: setup node.js
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v2.2.2
+      with:
+        version: 7
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'pnpm'
+        cache-dependency-path: 'examples/**/pnpm-lock.yaml'
+    - shell: bash
+      run: |
+        pnpm install
+        (cd examples/vitest && pnpm install)
+        (cd examples/jest && pnpm install)
