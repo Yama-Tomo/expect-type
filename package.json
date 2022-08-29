@@ -27,7 +27,7 @@
     "lint:typing": "tsc --pretty --noEmit",
     "lint:format": "prettier -c './**/*.{js,ts,tsx}'",
     "format": "prettier -w './**/*.{js,ts,tsx}'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "peerDependencies": {
     "typescript": ">=4"
