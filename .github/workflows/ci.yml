@@ -13,6 +13,13 @@ jobs:
       - uses: ./.github/actions/setup_node
       - run: pnpm lint
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup_node
+      - run: pnpm test
+
   example-jest:
     runs-on: ubuntu-latest
     steps:
