@@ -21,7 +21,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.prod.json",
     "lint": "FORCE_COLOR=true run-p -l -c lint:*",
     "lint:eslint": "eslint './**/*.{js,ts,tsx}' --format codeframe --color --max-warnings=0",
     "lint:typing": "tsc --pretty --noEmit",
