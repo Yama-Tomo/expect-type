@@ -75,9 +75,38 @@ const getTypeString = (filePath: FilePath, typeName: string) => {
 
   const toTypeString = (node: ts.Node | undefined) => {
     if (node) {
-      const typeLocation = checker.getTypeAtLocation(node);
-      if (typeLocation) {
-        return checker.typeToString(typeLocation, undefined, _options.typeFormat);
+      const getType = () => {
+        if (ts.isImportSpecifier(node)) {
+          const symbol = checker.getSymbolAtLocation(node.name);
+          return !symbol ? undefined : checker.getDeclaredTypeOfSymbol(symbol);
+        }
+
+        return checker.getTypeAtLocation(node);
+      };
+
+      const type = getType();
+      if (type) {
+        return checker.typeToString(type, undefined, _options.typeFormat);
+      }
+    }
+
+    return undefined;
+  };
+
+  const getTypeStringFromImportedModule = () => {
+    for (const statement of source.statements) {
+      if (!ts.isImportDeclaration(statement)) {
+        continue;
+      }
+
+      const typeString = statement.importClause?.namedBindings?.forEachChild((node) => {
+        if (ts.isImportSpecifier(node) && node.name.getText() === typeName) {
+          return toTypeString(node);
+        }
+      });
+
+      if (typeString) {
+        return typeString;
       }
     }
 
@@ -96,7 +125,8 @@ const getTypeString = (filePath: FilePath, typeName: string) => {
         (st): st is ts.InterfaceDeclaration =>
           ts.isInterfaceDeclaration(st) && st.name.getText() === typeName
       )
-    )
+    ) ??
+    getTypeStringFromImportedModule()
   );
 };
 
